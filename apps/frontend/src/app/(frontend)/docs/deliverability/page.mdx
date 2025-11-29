@@ -1,0 +1,295 @@
+---
+title: Domain Deliverability Check
+---
+
+# Domain Deliverability Check
+
+The Domain Deliverability Check tool helps you verify your domain's email authentication configuration. It checks your SPF, DKIM, DMARC, and MX records to ensure your emails reach the inbox.
+
+## Why Email Authentication Matters
+
+Email authentication is critical for:
+
+- **Deliverability**: Emails from authenticated domains are less likely to be marked as spam
+- **Security**: Protects your domain from being spoofed by bad actors
+- **Reputation**: Builds trust with email providers and recipients
+- **Compliance**: Many B2B recipients require proper authentication
+
+Without proper configuration, your emails may be rejected, quarantined, or marked as spam.
+
+## Using the Tool
+
+1. Navigate to [/deliverability](/deliverability)
+2. Enter your domain (e.g., `example.com`)
+3. Click "Check Domain"
+4. Review the results and recommendations
+
+The tool will check:
+
+- **SPF Records**: Sender Policy Framework authentication
+- **DKIM Records**: DomainKeys Identified Mail signatures
+- **DMARC Records**: Domain-based Message Authentication policies
+- **MX Records**: Mail server configuration
+
+## Understanding the Results
+
+### SPF (Sender Policy Framework)
+
+SPF records specify which mail servers are authorized to send email on behalf of your domain.
+
+**Example SPF Record:**
+```
+v=spf1 include:_spf.google.com ~all
+```
+
+**Common Issues:**
+
+- **Missing SPF record**: Add a TXT record to your DNS with your SPF configuration
+- **Too many DNS lookups**: SPF has a limit of 10 DNS lookups. Consolidate includes or use IP ranges
+- **No fail policy**: End your SPF record with `~all` (soft fail) or `-all` (hard fail)
+
+**How to Fix:**
+
+Add a TXT record to your domain's DNS:
+
+```
+Type: TXT
+Host: @
+Value: v=spf1 include:_spf.yourprovider.com ~all
+```
+
+Replace `_spf.yourprovider.com` with your email provider's SPF include.
+
+### DKIM (DomainKeys Identified Mail)
+
+DKIM adds a digital signature to your emails, proving they haven't been tampered with.
+
+**How DKIM Works:**
+
+1. Your email server adds a cryptographic signature to outgoing emails
+2. The public key is published in your DNS records
+3. Receiving servers verify the signature using the public key
+
+**Common Issues:**
+
+- **No DKIM record**: Configure DKIM through your email service provider
+- **Invalid selector**: Ensure you're using the correct DKIM selector
+- **Key rotation needed**: Rotate DKIM keys periodically for security
+
+**How to Fix:**
+
+1. Generate a DKIM key pair through your email provider
+2. Add the public key to your DNS as a TXT record
+3. Enable DKIM signing in your email service
+
+**Example DKIM Record:**
+
+```
+Type: TXT
+Host: default._domainkey
+Value: v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQ...
+```
+
+### DMARC (Domain-based Message Authentication)
+
+DMARC builds on SPF and DKIM to tell receiving servers what to do with emails that fail authentication.
+
+**Example DMARC Record:**
+
+```
+v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com; ruf=mailto:dmarc@example.com; pct=100
+```
+
+**DMARC Policies:**
+
+- `p=none`: Monitor mode - collect reports but don't take action
+- `p=quarantine`: Quarantine suspicious emails
+- `p=reject`: Reject emails that fail authentication
+
+**Common Issues:**
+
+- **No DMARC record**: Add a DMARC record to monitor email authentication
+- **Policy set to "none"**: Start with "none" to monitor, then move to "quarantine" or "reject"
+- **No reporting addresses**: Add `rua=` for aggregate reports and `ruf=` for forensic reports
+
+**How to Fix:**
+
+Add a TXT record to your DNS:
+
+```
+Type: TXT
+Host: _dmarc
+Value: v=DMARC1; p=quarantine; rua=mailto:dmarc-reports@example.com; pct=100
+```
+
+**DMARC Implementation Strategy:**
+
+1. Start with `p=none` to monitor without affecting delivery
+2. Review DMARC reports for 2-4 weeks
+3. Identify legitimate sending sources and update SPF/DKIM
+4. Gradually increase to `p=quarantine` then `p=reject`
+
+### MX Records
+
+MX records specify which mail servers handle email for your domain.
+
+**Example MX Records:**
+
+```
+10 mail.example.com
+20 backup-mail.example.com
+```
+
+**Common Issues:**
+
+- **No MX records**: Your domain cannot receive email
+- **Single MX record**: No redundancy if primary server fails
+- **Incorrect priority**: Lower numbers have higher priority
+
+## Best Practices
+
+### 1. Warm Up Your Domain
+
+When sending from a new domain or IP:
+
+- Start with low volumes (10-20 emails/day)
+- Gradually increase over 2-4 weeks
+- Target engaged recipients first
+- Monitor bounce and spam complaint rates
+
+### 2. Maintain List Hygiene
+
+- Remove hard bounces immediately
+- Suppress unengaged contacts after 90-180 days
+- Validate email addresses before importing
+- Use double opt-in for new subscribers
+
+### 3. Monitor Your Metrics
+
+Track these key metrics:
+
+- **Bounce Rate**: Should be < 2%
+- **Spam Complaint Rate**: Should be < 0.1%
+- **Open Rate**: Varies by industry (15-25% typical)
+- **Unsubscribe Rate**: Should be < 0.5%
+
+### 4. Use Dedicated IPs
+
+For high-volume sending (100k+ emails/month):
+
+- Use dedicated IP addresses
+- Maintain consistent sending patterns
+- Keep IP reputation separate from shared pools
+- Warm up new IPs properly
+
+### 5. Segment Your Sending
+
+- Separate transactional and marketing emails
+- Use different subdomains for different email types
+- Example: `marketing.example.com` vs `transactional.example.com`
+
+## Testing Your Configuration
+
+After making changes:
+
+1. Use the [Deliverability Check tool](/deliverability)
+2. Send test emails to Gmail, Outlook, and Yahoo
+3. Check spam folders and email headers
+4. Use tools like [mail-tester.com](https://www.mail-tester.com/) for additional validation
+
+## Common Email Provider Requirements
+
+### Gmail
+
+- Requires SPF or DKIM (both recommended)
+- DMARC strongly recommended for bulk sending
+- Rate limit: ~2,000 emails/day for free accounts
+
+### Microsoft (Outlook, Hotmail)
+
+- Requires SPF and DKIM
+- DMARC recommended
+- Sign up for [SNDS](https://postmaster.live.com/snds/) to monitor reputation
+
+### Yahoo
+
+- Requires DMARC with `p=reject` or `p=quarantine` for bulk senders
+- SPF and DKIM required
+- Very strict on authentication
+
+## Troubleshooting
+
+### Emails Going to Spam
+
+1. Check SPF, DKIM, and DMARC configuration
+2. Review email content for spam triggers
+3. Ensure proper list hygiene
+4. Check if your IP/domain is blocklisted
+5. Improve engagement rates
+
+### High Bounce Rates
+
+1. Validate email addresses before sending
+2. Remove hard bounces immediately
+3. Check for typos in email addresses
+4. Verify MX records are correct
+
+### Authentication Failures
+
+1. Wait 24-48 hours for DNS changes to propagate
+2. Check DNS records with multiple tools
+3. Verify DKIM selector matches configuration
+4. Ensure SPF includes all sending sources
+
+## Advanced Configuration
+
+### Multiple Sending Domains
+
+Use subdomains for different email types:
+
+```
+transactional.example.com  � SPF, DKIM, DMARC
+marketing.example.com      � SPF, DKIM, DMARC
+support.example.com        � SPF, DKIM, DMARC
+```
+
+### BIMI (Brand Indicators for Message Identification)
+
+After configuring DMARC with `p=quarantine` or `p=reject`:
+
+1. Create an SVG logo (max 32KB)
+2. Host on HTTPS endpoint
+3. Add BIMI DNS record
+4. Register VMC (Verified Mark Certificate) for Gmail
+
+**Example BIMI Record:**
+
+```
+Type: TXT
+Host: default._bimi
+Value: v=BIMI1; l=https://example.com/logo.svg; a=https://example.com/vmc.pem
+```
+
+## Additional Resources
+
+- [DMARC Guide](https://dmarc.org/)
+- [Google Postmaster Tools](https://postmaster.google.com/)
+- [Microsoft SNDS](https://postmaster.live.com/snds/)
+- [MXToolbox](https://mxtoolbox.com/)
+
+## Need Help?
+
+If you're having trouble configuring email authentication:
+
+1. Check our [community forums](https://github.com/pypes-dev/coldflow/discussions)
+2. Review your email provider's documentation
+3. Consider working with an email deliverability consultant
+4. Use Coldflow's guided setup for automated configuration
+
+## Next Steps
+
+After verifying your domain configuration:
+
+1. [Set up your first campaign](/docs/campaigns)
+2. [Configure mailbox rotation](/docs/mailbox-setup)
+3. [Learn about email personalization](/docs/personalization)

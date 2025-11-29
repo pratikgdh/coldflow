@@ -3,6 +3,7 @@ import nextra from 'nextra'
 import redirects from './redirects.js'
 
 const withNextra = nextra({
+  search: true,
 })
 
 
