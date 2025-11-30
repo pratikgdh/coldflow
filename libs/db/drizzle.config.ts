@@ -1,4 +1,9 @@
 import type { Config } from "drizzle-kit";
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Load environment variables from root .env.local
+config({ path: resolve(__dirname, "../../apps/frontend/.env") });
 
 export default {
   dialect: "postgresql",

@@ -1,21 +1,40 @@
 ---
 title: Introduction
 asIndexPage: true
+description: Coldflow's intro details the benefit of using our platform.
 ---
+import { OverviewBoxes } from '../../../components/OverviewBoxes/OverviewBoxes'
+import { Zap, Server, Code } from 'lucide-react'
 
-# ColdFlow Documentation
+export const quickstartBoxes = [
+  {
+    title: 'Quickstart',
+    description: 'Get up and running',
+    href: '/docs/quickstart',
+    icon: <Zap />
+  },
+  {
+    title: 'Self-hosting ColdFlow',
+    description: 'Deploy ColdFlow on your own infrastructure',
+    href: '/docs/self-hosted',
+    icon: <Server />
+  },
+  {
+    title: 'API Reference',
+    description: 'Explore the ColdFlow API',
+    href: '/docs/api',
+    icon: <Code />
+  }
+]
+
 
 Welcome to the **ColdFlow** docs 👋
 
-ColdFlow is an open-source cold email platform designed for
-engineers and growth teams who want:
+ColdFlow a better cold email platform
 
 - Self-hosted control over deliverability
 - Simple OAuth-based mailbox connections
-- Opinionated, modern DX with Next.js & pnpm
+- Exchange or buy lists from other members on the marketplace
 
 ## Quick links
-
-- [Quickstart](/docs/quickstart)
-- [Self-hosting ColdFlow](/docs/self-hosted)
-- [API Reference](/docs/api)
+<OverviewBoxes boxes={quickstartBoxes} />

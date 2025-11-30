@@ -1,0 +1,41 @@
+---
+title: Self-hosting ColdFlow
+---
+
+# Self-hosting ColdFlow
+
+Deploy ColdFlow on your own infrastructure for complete control over your cold email platform.
+
+## Why Self-host?
+
+- **Full Control**: Manage your own deliverability and sender reputation
+- **Data Privacy**: Keep all your email data on your own servers
+- **Custom Configuration**: Tailor ColdFlow to your specific needs
+- **Cost Efficiency**: Scale without vendor markup
+
+## Prerequisites
+
+- Docker and Docker Compose installed
+- PostgreSQL database
+- Domain with DNS access for email deliverability
+
+## Deployment Steps
+
+1. Clone the repository
+2. Configure environment variables
+3. Set up your database
+4. Configure email sending infrastructure
+5. Deploy using Docker
+
+For detailed deployment instructions, see the deployment guide in the repository.
+
+## Infrastructure Requirements
+
+- **Compute**: 2+ CPU cores, 4GB+ RAM recommended
+- **Database**: PostgreSQL 14+
+- **Storage**: 20GB+ for application and logs
+- **Network**: Static IP with reverse DNS configured
+
+## Next Steps
+
+After deployment, proceed to [Mailbox Setup](/docs/mailbox-setup) to connect your first email account.

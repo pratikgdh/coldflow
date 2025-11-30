@@ -1,0 +1,65 @@
+---
+title: API Reference
+---
+
+# API Reference
+
+The ColdFlow API provides programmatic access to manage your cold email campaigns, contacts, and mailboxes.
+
+## Base URL
+
+```
+https://api.coldflow.io/v1
+```
+
+For self-hosted instances, use your own domain.
+
+## Authentication
+
+All API requests require authentication using an API key:
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  https://api.coldflow.io/v1/campaigns
+```
+
+## Core Endpoints
+
+### Campaigns
+
+- `GET /campaigns` - List all campaigns
+- `POST /campaigns` - Create a new campaign
+- `GET /campaigns/:id` - Get campaign details
+- `PUT /campaigns/:id` - Update a campaign
+- `DELETE /campaigns/:id` - Delete a campaign
+
+### Contacts
+
+- `GET /contacts` - List all contacts
+- `POST /contacts` - Create a new contact
+- `GET /contacts/:id` - Get contact details
+- `PUT /contacts/:id` - Update a contact
+- `DELETE /contacts/:id` - Delete a contact
+
+### Mailboxes
+
+- `GET /mailboxes` - List connected mailboxes
+- `POST /mailboxes` - Connect a new mailbox
+- `GET /mailboxes/:id` - Get mailbox details
+- `DELETE /mailboxes/:id` - Disconnect a mailbox
+
+## Rate Limits
+
+- 100 requests per minute per API key
+- 10,000 requests per day per API key
+
+## Webhooks
+
+Configure webhooks to receive real-time notifications about email events:
+
+- Email sent
+- Email opened
+- Email replied
+- Bounce detected
+
+For detailed API documentation and examples, visit the interactive API explorer.
