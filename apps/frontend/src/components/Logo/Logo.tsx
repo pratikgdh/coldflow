@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import Image from 'next/image'
 
 interface Props {
   className?: string
@@ -8,11 +9,18 @@ interface Props {
 }
 
 export const Logo = (props: Props) => {
-  const { className } = props
+  const { className, loading = 'eager', priority = 'high' } = props
 
   return (
-    <div className={clsx('text-2xl font-bold', className)}>
-      coldflow
+    <div className={clsx('flex gap-2 items-start', className)}>
+      <Image
+        src="/ColdFlowLogoLong.png"
+        alt="coldflow logo"
+        width={250}
+        height={40}
+        loading={loading}
+        priority={priority === 'high'}
+      />
     </div>
   )
 }

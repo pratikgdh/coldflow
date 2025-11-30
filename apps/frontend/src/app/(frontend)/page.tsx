@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { Footer } from '@/Footer/Component'
 
 export const metadata: Metadata = {
   title: 'Coldflow - Open Source Cold Email Platform',
@@ -232,6 +233,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

@@ -1,0 +1,12 @@
+---
+title: 🚦 A Critical Note on "Cold Email" and Deliverability
+---
+
+
+Building a tool for cold outreach means you must prioritize deliverability to avoid your users' emails being marked as spam.
+
+Respect Sending Limits: Major email providers have strict limits. For instance, Google Workspace allows 2,000 messages per day, but for cold email, a safer, recommended volume is around 100 per day per inbox to avoid spam filters. Sending limits exist to control spam and ensure system performance.
+
+Implement Email Warm-up: You cannot start sending a high volume from a new address. The sender's reputation must be "warmed up" by gradually increasing sending volume and generating positive engagement (like opens and replies) over a few weeks.
+
+Plan for Scaling: To send at a larger scale (e.g., 2,000 emails/day), the common technique is to use a "multi-sender" architecture, distributing the load across multiple warmed-up email addresses, ideally across different domains.

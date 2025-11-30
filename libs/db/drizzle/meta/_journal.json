@@ -8,6 +8,20 @@
       "when": 1764513300812,
       "tag": "0000_awesome_trauma",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764521576481,
+      "tag": "0001_closed_bug",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764522421895,
+      "tag": "0002_vengeful_roland_deschain",
+      "breakpoints": true
     }
   ]
 }

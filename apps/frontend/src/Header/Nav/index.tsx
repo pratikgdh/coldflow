@@ -1,10 +1,11 @@
 'use client'
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { authClient } from '@/access/authClient'
 
 export const HeaderNav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
-
+  const { data: session } = authClient.useSession()
   const toggleMenu = () => setIsOpen(!isOpen)
   const closeMenu = () => setIsOpen(false)
 
@@ -30,10 +31,10 @@ export const HeaderNav: React.FC = () => {
           </Link>
         ))}
         <Link
-          href="/auth/signup"
+          href={session ? '/dashboard' : '/auth/signup'}
           className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
         >
-          Get Started
+         {session ? 'Dashboard' : 'Get Started'}
         </Link>
       </nav>
 

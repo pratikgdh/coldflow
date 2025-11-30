@@ -23,7 +23,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -39,7 +38,7 @@ export default function SignupPage() {
       if (error) {
         setError(error.message || 'Failed to sign up')
       } else if (data) {
-        router.push('/auth/login')
+        router.push('/dashboard')
       }
     } catch (err) {
       setError('An unexpected error occurred')
