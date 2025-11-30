@@ -34,6 +34,12 @@
       "@/*": [
         "./src/*"
       ],
+      "@coldflow/db": [
+        "../../libs/db/src"
+      ],
+      "@coldflow/auth": [
+        "../../libs/auth/src"
+      ],
     }
   },
   "include": [

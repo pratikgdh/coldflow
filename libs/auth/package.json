@@ -1,0 +1,11 @@
+{
+    "name": "@coldflow/auth",
+    "private": true,
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+      "@coldflow/db": "workspace:*",
+      "better-auth": "^1.4.3"
+    }
+  }
+  
