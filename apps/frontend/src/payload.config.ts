@@ -61,7 +61,6 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || "",
     },
-    push: false, // Disable auto-push to prevent deleting existing tables
   }),
   collections: [Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
