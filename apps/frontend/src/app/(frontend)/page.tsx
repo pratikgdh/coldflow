@@ -67,44 +67,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Coldflow CTA */}
-      <section className="bg-card border-y border-border">
-        <div className="container py-16 md:py-24">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl mb-8 text-center">
-              Built Different
-            </h2>
-            <div className="space-y-6 mb-10">
-              <div>
-                <p className="text-lg">
-                  <strong className="font-semibold">Open Source.</strong> No vendor lock-in. Self-host or use our managed service.
-                </p>
-              </div>
-              <div>
-                <p className="text-lg">
-                  <strong className="font-semibold">Developer-Friendly.</strong> REST API, webhooks, and plugin architecture.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/auth/signup"
-                className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                Get Started
-              </Link>
-              <Link
-                href="/docs"
-                className="inline-flex items-center justify-center rounded-md border border-border bg-background px-8 py-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
-              >
-                Read Docs
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
       {/* Final CTA */}
       <section className="bg-card border-y border-border">
         <div className="container py-16 md:py-24">
