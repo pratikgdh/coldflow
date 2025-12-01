@@ -37,6 +37,10 @@ const getPagesSitemap = unstable_cache(
         lastmod: dateFallback,
       },
       {
+        loc: `${SITE_URL}/deliverability`,
+        lastmod: dateFallback,
+      },
+      {
         loc: `${SITE_URL}/posts`,
         lastmod: dateFallback,
       },
