@@ -59,12 +59,41 @@ export interface AgencyUser {
 export interface Invitation {
   id: string
   email: string
-  role: 'admin' | 'member' | 'viewer'
-  subAgencyId: string
+  token: string
+  role?: 'admin' | 'member' | 'viewer'
+  subAgencyId?: string
   subAgencyName?: string
   status: 'pending' | 'accepted' | 'expired'
   createdAt: string
   expiresAt: string
+}
+
+// API Key Types
+export interface ApiKey {
+  id: string
+  name: string
+  prefix: string
+  userId: string
+  subAgencyId: string | null
+  subAgencyName: string | null
+  lastUsedAt: string | null
+  createdAt: string
+  expiresAt: string | null
+}
+
+export interface CreateApiKeyRequest {
+  name: string
+  subAgencyId?: string
+  expiresInDays?: number
+}
+
+export interface CreateApiKeyResponse {
+  apiKey: string // Full plain key - only shown once
+  id: string
+  name: string
+  prefix: string
+  createdAt: string
+  expiresAt: string | null
 }
 
 // UI State Types

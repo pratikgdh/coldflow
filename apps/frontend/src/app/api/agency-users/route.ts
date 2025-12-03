@@ -94,7 +94,6 @@ export async function POST(request: NextRequest) {
     // Check if assignment already exists
     const existing = await getAgencyUserByUserAndAgency(
       validatedData.userId,
-      validatedData.subAgencyId
     )
 
     if (existing) {
@@ -109,8 +108,6 @@ export async function POST(request: NextRequest) {
     await createAgencyUser({
       id: assignmentId,
       userId: validatedData.userId,
-      subAgencyId: validatedData.subAgencyId,
-      role: validatedData.role,
     })
 
     // Fetch complete assignment with user and agency details

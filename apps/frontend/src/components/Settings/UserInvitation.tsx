@@ -14,6 +14,8 @@ export function UserInvitation() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [invitationLink, setInvitationLink] = useState<string | null>(null)
+  const [copySuccess, setCopySuccess] = useState<string | null>(null)
   const [formData, setFormData] = useState<InviteUserRequest>({
     email: '',
     role: 'member',
@@ -53,6 +55,8 @@ export function UserInvitation() {
     setSubmitting(true)
     setError(null)
     setSuccess(null)
+    setInvitationLink(null)
+    setCopySuccess(null)
 
     try {
       const response = await fetch('/api/users/invite', {
@@ -64,16 +68,47 @@ export function UserInvitation() {
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to send invitation')
+        throw new Error(result.error || 'Failed to create invitation')
       }
 
-      setSuccess(`Invitation sent to ${formData.email}`)
+      setSuccess(`Invitation created for ${formData.email}`)
+      setInvitationLink(result.invitationLink)
       setFormData({ email: '', role: 'member', subAgencyId: '' })
       await fetchInvitations()
     } catch (err: any) {
       setError(err.message)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const copyToClipboard = async (text: string, id?: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopySuccess(id || 'main')
+      setTimeout(() => setCopySuccess(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  const deleteInvitation = async (invitationId: string) => {
+    if (!confirm('Are you sure you want to delete this invitation?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/users/invite/${invitationId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete invitation')
+      }
+
+      await fetchInvitations()
+    } catch (err: any) {
+      setError(err.message)
     }
   }
 
@@ -101,8 +136,31 @@ export function UserInvitation() {
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-500 rounded text-sm text-green-700">
-            {success}
+          <div className="mb-4 p-4 bg-green-500/10 border border-green-500 rounded">
+            <p className="text-sm text-green-700 font-medium mb-2">{success}</p>
+            {invitationLink && (
+              <div className="mt-3">
+                <Label className="text-xs text-green-700">Invitation Link</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    value={invitationLink}
+                    readOnly
+                    className="font-mono text-xs"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => copyToClipboard(invitationLink, 'main')}
+                    size="sm"
+                    variant="outline"
+                  >
+                    {copySuccess === 'main' ? 'Copied!' : 'Copy'}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Share this link with the invitee to accept the invitation
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -170,7 +228,7 @@ export function UserInvitation() {
           </div>
 
           <Button type="submit" disabled={submitting || agencies.length === 0}>
-            {submitting ? 'Sending...' : 'Send Invitation'}
+            {submitting ? 'Creating...' : 'Create Invitation'}
           </Button>
         </form>
       </Card>
@@ -185,33 +243,54 @@ export function UserInvitation() {
           </p>
         ) : (
           <div className="space-y-3">
-            {invitations.map((invitation) => (
-              <div
-                key={invitation.id}
-                className="flex justify-between items-center p-3 border border-border rounded"
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{invitation.email}</p>
-                  <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
-                    <span className="capitalize">{invitation.role}</span>
-                    <span>
-                      Sent {new Date(invitation.createdAt).toLocaleDateString()}
-                    </span>
-                    <span
-                      className={
-                        invitation.status === 'pending'
-                          ? 'text-yellow-600'
-                          : invitation.status === 'accepted'
-                            ? 'text-green-600'
-                            : 'text-red-600'
-                      }
+            {invitations.map((invitation) => {
+              const inviteLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/accept-invite?token=${invitation.token}`
+              return (
+                <div
+                  key={invitation.id}
+                  className="flex justify-between items-start p-3 border border-border rounded gap-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm">{invitation.email}</p>
+                    <div className="flex gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
+                      {invitation.role && <span className="capitalize">{invitation.role}</span>}
+                      <span>
+                        Created {new Date(invitation.createdAt).toLocaleDateString()}
+                      </span>
+                      <span
+                        className={
+                          invitation.status === 'pending'
+                            ? 'text-yellow-600'
+                            : invitation.status === 'accepted'
+                              ? 'text-green-600'
+                              : 'text-red-600'
+                        }
+                      >
+                        {invitation.status}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <Button
+                      type="button"
+                      onClick={() => copyToClipboard(inviteLink, invitation.id)}
+                      size="sm"
+                      variant="outline"
                     >
-                      {invitation.status}
-                    </span>
+                      {copySuccess === invitation.id ? 'Copied!' : 'Copy Link'}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => deleteInvitation(invitation.id)}
+                      size="sm"
+                      variant="destructive"
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </Card>

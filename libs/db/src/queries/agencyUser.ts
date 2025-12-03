@@ -5,8 +5,6 @@ import { eq, and } from "drizzle-orm";
 export interface CreateAgencyUserData {
   id: string;
   userId: string;
-  subAgencyId: string;
-  role: "admin" | "member" | "viewer";
 }
 
 export const getAgencyUsersByOwner = async (ownerId: string, subAgencyId?: string) => {
@@ -70,12 +68,10 @@ export const getAgencyUserByIdWithDetails = async (id: string) => {
 
 export const getAgencyUserByUserAndAgency = async (
   userId: string,
-  subAgencyId: string
 ) => {
   return db.query.agencyUser.findFirst({
     where: and(
       eq(agencyUser.userId, userId),
-      eq(agencyUser.subAgencyId, subAgencyId)
     ),
   });
 };

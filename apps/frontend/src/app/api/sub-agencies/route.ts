@@ -61,8 +61,6 @@ export async function POST(request: NextRequest) {
     await createAgencyUser({
       id: nanoid(),
       userId: user.id,
-      subAgencyId: agencyId,
-      role: 'admin',
     })
 
     return NextResponse.json(newAgency, { status: 201 })

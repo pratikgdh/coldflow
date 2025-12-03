@@ -133,7 +133,7 @@ export const SideNavbar: React.FC = () => {
   <div className="border-t border-border flex-shrink-0">
         <button
           onClick={() => {
-            router.push('/dashboard/api-keys')
+            router.push('/dashboard/settings/api-keys')
           }}
           className="w-full px-4 py-2 text-left flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
         >

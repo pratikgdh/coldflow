@@ -6,12 +6,19 @@ import {
   getUserRole as dbGetUserRole,
   isSubAgencyOwner,
 } from '@coldflow/db'
+import { NextRequest } from 'next/server'
+import {
+  authenticateApiKey,
+  ApiKeyAuthenticatedUser,
+} from './apiKeyAuth'
 
 export interface AuthenticatedUser {
   id: string
   email: string
   name: string
 }
+
+export type AuthUser = AuthenticatedUser | ApiKeyAuthenticatedUser
 
 export class AuthorizationError extends Error {
   statusCode: number
@@ -96,4 +103,24 @@ export async function getUserRole(
   subAgencyId: string
 ): Promise<'admin' | 'member' | 'viewer' | null> {
   return dbGetUserRole(userId, subAgencyId)
+}
+
+/**
+ * Authenticate user via session OR API key
+ * Tries session auth first, then falls back to API key auth
+ * This allows endpoints to support both authentication methods
+ */
+export async function getAuthenticatedUser(
+  request: NextRequest
+): Promise<AuthUser> {
+  // Check for API key in Authorization header
+  const authHeader = request.headers.get('authorization')
+
+  if (authHeader?.startsWith('Bearer ')) {
+    // API key authentication
+    return await authenticateApiKey(request)
+  }
+
+  // Session authentication
+  return await requireAuth()
 }

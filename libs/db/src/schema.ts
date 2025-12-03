@@ -73,27 +73,6 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  ownedAgencies: many(subAgency),
-  agencyMemberships: many(agencyUser),
-}));
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}));
-
 // Role enum for user permissions
 export const roleEnum = pgEnum("role", ["admin", "member", "viewer"]);
 
@@ -129,7 +108,6 @@ export const agencyUser = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     subAgencyId: text("sub_agency_id")
-      .notNull()
       .references(() => subAgency.id, { onDelete: "cascade" }),
     role: roleEnum("role").notNull().default("member"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -169,6 +147,66 @@ export const agencyUserRelations = relations(agencyUser, ({ one }) => ({
   }),
   subAgency: one(subAgency, {
     fields: [agencyUser.subAgencyId],
+    references: [subAgency.id],
+  }),
+}));
+
+// API Key table
+export const apiKey = pgTable(
+  "api_key",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    hashedKey: text("hashed_key").notNull().unique(),
+    prefix: text("prefix").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    subAgencyId: text("sub_agency_id").references(() => subAgency.id, {
+      onDelete: "cascade",
+    }),
+    lastUsedAt: timestamp("last_used_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at"),
+  },
+  (table) => [
+    index("api_key_userId_idx").on(table.userId),
+    index("api_key_hashedKey_idx").on(table.hashedKey),
+    index("api_key_subAgencyId_idx").on(table.subAgencyId),
+    index("api_key_userId_subAgencyId_idx").on(table.userId, table.subAgencyId),
+  ]
+);
+
+// All Relations (defined after all tables)
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  ownedAgencies: many(subAgency),
+  agencyMemberships: many(agencyUser),
+  apiKeys: many(apiKey),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));
+
+export const apiKeyRelations = relations(apiKey, ({ one }) => ({
+  user: one(user, {
+    fields: [apiKey.userId],
+    references: [user.id],
+  }),
+  subAgency: one(subAgency, {
+    fields: [apiKey.subAgencyId],
     references: [subAgency.id],
   }),
 }));

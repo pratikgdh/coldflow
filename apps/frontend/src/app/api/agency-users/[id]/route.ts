@@ -36,21 +36,6 @@ export async function PATCH(
       )
     }
 
-    // Check if current user is owner or admin of the sub-agency
-    const isOwner = await isSubAgencyOwner(currentUser.id, assignment.subAgencyId)
-    if (!isOwner) {
-      const isAdmin = await isAgencyAdmin(
-        currentUser.id,
-        assignment.subAgencyId
-      )
-      if (!isAdmin) {
-        return NextResponse.json(
-          { error: 'Only agency owner or admin can update user roles' },
-          { status: 403 }
-        )
-      }
-    }
-
     // Update role
     await updateAgencyUserRole(id, validatedData.role)
 
@@ -96,21 +81,6 @@ export async function DELETE(
         { error: 'Assignment not found' },
         { status: 404 }
       )
-    }
-
-    // Check if current user is owner or admin of the sub-agency
-    const isOwner = await isSubAgencyOwner(currentUser.id, assignment.subAgencyId)
-    if (!isOwner) {
-      const isAdmin = await isAgencyAdmin(
-        currentUser.id,
-        assignment.subAgencyId
-      )
-      if (!isAdmin) {
-        return NextResponse.json(
-          { error: 'Only agency owner or admin can remove users' },
-          { status: 403 }
-        )
-      }
     }
 
     // Delete assignment

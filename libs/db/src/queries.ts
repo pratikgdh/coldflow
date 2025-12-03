@@ -10,3 +10,4 @@ export const getCurrentTime = async () => {
 export * from "./queries/subAgency";
 export * from "./queries/agencyUser";
 export * from "./queries/invitation";
+export * from "./queries/apiKey";

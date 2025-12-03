@@ -1,0 +1,1 @@
+ALTER TABLE "agency_user" ALTER COLUMN "sub_agency_id" DROP NOT NULL;

@@ -68,32 +68,29 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7)
 
-    // Store invitation in verification table
+    // Store invitation in verification table with role and subAgencyId
     await createInvitation({
       id: nanoid(),
       email: validatedData.email,
       token,
+      role: validatedData.role,
+      subAgencyId: validatedData.subAgencyId,
       expiresAt,
     })
 
-    // TODO: Send email with invitation link
-    // For now, we'll return the invitation details
+    // Generate invitation link
     const invitationLink = `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/accept-invite?token=${token}`
 
-    // In production, you would send an email here using your email service
-    console.log('Invitation link:', invitationLink)
+    // Return response with invitation details
+    const response: any = {
+      message: 'Invitation created successfully',
+      email: validatedData.email,
+      role: validatedData.role,
+      subAgencyName: agency.name,
+      invitationLink,
+    }
 
-    return NextResponse.json(
-      {
-        message: 'Invitation sent successfully',
-        email: validatedData.email,
-        role: validatedData.role,
-        subAgencyName: agency.name,
-        // Remove this in production - only for development
-        invitationLink,
-      },
-      { status: 201 }
-    )
+    return NextResponse.json(response, { status: 201 })
   } catch (error: any) {
     if (error.statusCode === 401 || error.statusCode === 403) {
       return NextResponse.json(
@@ -145,9 +142,21 @@ export async function GET(request: NextRequest) {
       const now = new Date()
       const isExpired = inv.expiresAt < now
 
+      // Parse the JSON value to get token, role, and subAgencyId
+      let invitationData
+      try {
+        invitationData = JSON.parse(inv.value)
+      } catch (e) {
+        // Fallback for old format (just token string)
+        invitationData = { token: inv.value, role: undefined, subAgencyId: undefined }
+      }
+
       return {
         id: inv.id,
         email,
+        token: invitationData.token,
+        role: invitationData.role,
+        subAgencyId: invitationData.subAgencyId,
         status: isExpired ? 'expired' : 'pending',
         createdAt: inv.createdAt.toISOString(),
         expiresAt: inv.expiresAt.toISOString(),

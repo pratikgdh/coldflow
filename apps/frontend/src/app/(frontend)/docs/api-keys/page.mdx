@@ -1,0 +1,294 @@
+# API Keys Documentation
+
+## Overview
+
+API keys allow you to access the Coldflow platform programmatically. They provide a secure way to authenticate API requests without requiring interactive login sessions.
+
+## Creating an API Key
+
+1. Navigate to **Settings** > **API Keys**
+2. Click **Create API Key**
+3. Provide a descriptive name for your key
+4. (Optional) Scope the key to a specific sub-agency
+5. (Optional) Set an expiration period
+6. Click **Create API Key**
+7. **Important:** Copy and save your API key immediately - you won't be able to see it again!
+
+## API Key Format
+
+API keys follow this format:
+
+```
+cfk_<64 hexadecimal characters>
+```
+
+Example:
+```
+cfk_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2
+```
+
+- **Prefix:** `cfk_` (ColdFlow Key)
+- **Length:** 68 characters total
+- **Entropy:** 256 bits of randomness
+
+## Using API Keys
+
+### Authentication Header
+
+Include your API key in the `Authorization` header of your HTTP requests using the Bearer token format:
+
+```
+Authorization: Bearer cfk_your_api_key_here
+```
+
+### Example Requests
+
+#### cURL
+
+```bash
+curl -X GET https://api.coldflow.com/api/sub-agencies \
+  -H "Authorization: Bearer cfk_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2"
+```
+
+#### JavaScript (fetch)
+
+```javascript
+const apiKey = 'cfk_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2'
+
+const response = await fetch('https://api.coldflow.com/api/sub-agencies', {
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  }
+})
+
+const data = await response.json()
+console.log(data)
+```
+
+#### Python (requests)
+
+```python
+import requests
+
+api_key = 'cfk_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2'
+
+headers = {
+    'Authorization': f'Bearer {api_key}',
+    'Content-Type': 'application/json'
+}
+
+response = requests.get('https://api.coldflow.com/api/sub-agencies', headers=headers)
+data = response.json()
+print(data)
+```
+
+#### Node.js (axios)
+
+```javascript
+const axios = require('axios')
+
+const apiKey = 'cfk_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2'
+
+const response = await axios.get('https://api.coldflow.com/api/sub-agencies', {
+  headers: {
+    'Authorization': `Bearer ${apiKey}`
+  }
+})
+
+console.log(response.data)
+```
+
+## Sub-Agency Scoping
+
+When you create an API key, you can optionally scope it to a specific sub-agency. This limits the key's access to only that sub-agency's resources.
+
+### Benefits of Scoping
+
+- **Least Privilege:** Keys can only access what they need
+- **Security:** Reduces the impact if a key is compromised
+- **Organization:** Different keys for different teams or purposes
+
+### How It Works
+
+- **Scoped Key:** Can only access resources within the specified sub-agency
+- **Unscoped Key:** Has access to all sub-agencies you own or administer
+
+### Example
+
+If you create a key scoped to "Marketing Agency", that key can only:
+- List users in the Marketing Agency
+- Access Marketing Agency data
+- Perform actions within the Marketing Agency
+
+Requests to other sub-agencies will return a `403 Forbidden` error.
+
+## Expiration Policies
+
+### Setting Expiration
+
+When creating an API key, you can set an expiration period:
+
+- **30 days** - Short-term keys for temporary access
+- **60 days** - Medium-term keys
+- **90 days** - Recommended for most use cases
+- **180 days** - Long-term keys
+- **1 year** - Annual rotation
+- **Never expires** - Use with caution
+
+### Recommendations
+
+1. **Default to 90 days:** Balances convenience with security
+2. **Never expires:** Only for trusted automation that can't be easily updated
+3. **Rotate regularly:** Create new keys and delete old ones periodically
+4. **Short expiration for testing:** Use 30-day keys for development and testing
+
+### Expired Keys
+
+- Expired keys are automatically rejected with a `401 Unauthorized` error
+- The API will return: `"API key has expired"`
+- Create a new key to restore access
+- Old expired keys remain in your list until manually deleted
+
+## Security Best Practices
+
+### Do's
+
+✅ **Store keys securely**
+- Use environment variables
+- Use secret management services (AWS Secrets Manager, HashiCorp Vault)
+- Encrypt keys at rest
+
+✅ **Rotate keys regularly**
+- Set expiration dates
+- Create new keys before old ones expire
+- Delete unused keys immediately
+
+✅ **Use scoped keys**
+- Limit keys to specific sub-agencies when possible
+- Create separate keys for different purposes
+
+✅ **Monitor key usage**
+- Check "Last Used" dates regularly
+- Investigate unused keys
+- Review audit logs
+
+✅ **Use HTTPS only**
+- Never send keys over unencrypted HTTP
+- Verify SSL certificates
+
+### Don'ts
+
+❌ **Never commit keys to version control**
+- Don't add keys to Git repositories
+- Add `.env` files to `.gitignore`
+- Use secret scanning tools
+
+❌ **Never share keys**
+- Each service should have its own key
+- Don't email or message keys
+- Don't post keys in Slack or public forums
+
+❌ **Never log keys**
+- Redact keys from application logs
+- Don't include keys in error messages
+- Avoid printing keys to console
+
+❌ **Never use keys in client-side code**
+- API keys are for server-to-server communication
+- Don't embed keys in JavaScript, mobile apps, or public code
+- Use session-based authentication for frontend applications
+
+## Rate Limiting
+
+API key creation is rate limited to prevent abuse:
+
+- **Limit:** 5 new keys per hour per user
+- **Response:** `429 Too Many Requests` when limit exceeded
+- **Header:** `Retry-After` header indicates seconds until reset
+
+Example error response:
+
+```json
+{
+  "error": "Rate limit exceeded",
+  "message": "Too many API key creation requests. Please try again in 3420 seconds."
+}
+```
+
+## Troubleshooting
+
+### 401 Unauthorized
+
+**Cause:** Invalid, expired, or malformed API key
+
+**Solutions:**
+- Verify the key is correct (no extra spaces or characters)
+- Check if the key has expired
+- Ensure you're using the `Bearer` prefix
+- Confirm the key hasn't been deleted
+
+### 403 Forbidden
+
+**Cause:** API key doesn't have access to the requested resource
+
+**Solutions:**
+- Check if the key is scoped to the correct sub-agency
+- Verify you have the necessary permissions
+- Confirm the resource exists and belongs to your account
+
+### 429 Too Many Requests
+
+**Cause:** Rate limit exceeded for API key creation
+
+**Solutions:**
+- Wait for the time specified in the `Retry-After` header
+- Delete unused keys before creating new ones
+- Contact support if you need a higher rate limit
+
+## API Key Lifecycle
+
+### 1. Creation
+
+- User creates key via Settings > API Keys
+- System generates secure random key
+- Key is hashed with bcrypt before storage
+- Plain key shown once to user
+
+### 2. Active Use
+
+- Key authenticates API requests
+- Last used timestamp updated on each use
+- Audit logs track all usage
+- Key remains valid until expiration or deletion
+
+### 3. Expiration (Optional)
+
+- Keys automatically expire after the specified period
+- Expired keys return `401 Unauthorized`
+- Keys remain in the list until manually deleted
+- No automatic deletion of expired keys
+
+### 4. Deletion
+
+- User manually deletes key via UI or API
+- Deletion is immediate and irreversible
+- Key becomes invalid instantly
+- All audit logs are retained
+
+## Support
+
+If you have questions or issues with API keys:
+
+1. Check this documentation first
+2. Review the [API Reference](/docs/api-reference)
+3. Contact support at support@coldflow.com
+4. Include relevant error messages and timestamps
+
+## Updates and Changes
+
+This documentation reflects the current API key system. For the latest updates:
+
+- Check the [Changelog](/docs/changelog)
+- Subscribe to API updates
+- Follow our [Status Page](https://status.coldflow.com)

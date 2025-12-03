@@ -11,7 +11,8 @@
 
 # MVP features:
 
-- enter a domain and see SPF / dkim / dmarc records
+✅ - enter a domain and see SPF / dkim / dmarc records
+
 - connect google smtp accounts
 - upload a csv of contacts
 - Create a single-step email sequence with basic personalization ({first_name}).
