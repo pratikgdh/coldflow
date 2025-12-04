@@ -36,6 +36,13 @@
       "when": 1764787594862,
       "tag": "0004_simple_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1764798191449,
+      "tag": "0005_yielding_black_panther",
+      "breakpoints": true
     }
   ]
 }

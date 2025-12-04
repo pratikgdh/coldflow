@@ -21,7 +21,6 @@ function AcceptInviteContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
 
   // Form state
   const [email, setEmail] = useState('')
@@ -52,7 +51,7 @@ function AcceptInviteContent() {
           setLoading(false)
           return
         }
-
+        console.log('data', data)
         setInvitation(data)
         setEmail(data.email)
         setLoading(false)
@@ -86,32 +85,6 @@ function AcceptInviteContent() {
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message)
-    }
-  }
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setAuthLoading(true)
-
-    try {
-      const { data, error } = await authClient.signIn.email({
-        email,
-        password,
-      })
-
-      if (error) {
-        setError(error.message || 'Failed to sign in')
-        setAuthLoading(false)
-        return
-      }
-
-      // Successfully signed in, now accept the invitation
-      await handleAcceptInvitation()
-    } catch (err: any) {
-      setError('An unexpected error occurred')
-      console.error(err)
-      setAuthLoading(false)
     }
   }
 
@@ -188,135 +161,65 @@ function AcceptInviteContent() {
           </CardDescription>
         </CardHeader>
 
-        {/* Tab Selector */}
-        <div className="flex border-b">
-          <button
-            onClick={() => setMode('signin')}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
-              mode === 'signin'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-muted-foreground hover:text-primary'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            onClick={() => setMode('signup')}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
-              mode === 'signup'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-muted-foreground hover:text-primary'
-            }`}
-          >
-            Create Account
-          </button>
-        </div>
+        <form onSubmit={handleSignUp}>
+          <CardContent className="space-y-4 pt-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                disabled={authLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={authLoading}
+                className="bg-muted"
+                readOnly
+              />
+              <p className="text-xs text-muted-foreground">
+                This invitation is for this email address
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={authLoading}
+                minLength={8}
+              />
+              <p className="text-xs text-muted-foreground">
+                Password must be at least 8 characters
+              </p>
+            </div>
 
-        {mode === 'signin' ? (
-          <form onSubmit={handleSignIn}>
-            <CardContent className="space-y-4 pt-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={authLoading}
-                  className="bg-muted"
-                  readOnly
-                />
-                <p className="text-xs text-muted-foreground">
-                  This invitation is for this email address
-                </p>
+            {error && (
+              <div className="rounded border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={authLoading}
-                />
-              </div>
-
-              {error && (
-                <div className="rounded border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
-                  {error}
-                </div>
-              )}
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full" disabled={authLoading}>
-                {authLoading ? 'Signing in...' : 'Sign In & Accept Invitation'}
-              </Button>
-            </CardFooter>
-          </form>
-        ) : (
-          <form onSubmit={handleSignUp}>
-            <CardContent className="space-y-4 pt-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  disabled={authLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={authLoading}
-                  className="bg-muted"
-                  readOnly
-                />
-                <p className="text-xs text-muted-foreground">
-                  This invitation is for this email address
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={authLoading}
-                  minLength={8}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters
-                </p>
-              </div>
-
-              {error && (
-                <div className="rounded border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
-                  {error}
-                </div>
-              )}
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full" disabled={authLoading}>
-                {authLoading ? 'Creating account...' : 'Create Account & Accept Invitation'}
-              </Button>
-            </CardFooter>
-          </form>
-        )}
+            )}
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" className="w-full" disabled={authLoading}>
+              {authLoading ? 'Creating account...' : 'Create Account & Accept Invitation'}
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   )

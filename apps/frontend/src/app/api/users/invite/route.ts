@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       role: validatedData.role,
       subAgencyId: validatedData.subAgencyId,
       expiresAt,
+      createdBy: currentUser.id,
     })
 
     // Generate invitation link
@@ -134,36 +135,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const invitations = await getPendingInvitations()
+    const invitations = await getPendingInvitations(currentUser.id)
 
-    // Transform invitations for response
-    const formattedInvitations = invitations.map((inv) => {
-      const email = inv.identifier.replace('invite:', '')
-      const now = new Date()
-      const isExpired = inv.expiresAt < now
-
-      // Parse the JSON value to get token, role, and subAgencyId
-      let invitationData
-      try {
-        invitationData = JSON.parse(inv.value)
-      } catch (e) {
-        // Fallback for old format (just token string)
-        invitationData = { token: inv.value, role: undefined, subAgencyId: undefined }
-      }
-
-      return {
-        id: inv.id,
-        email,
-        token: invitationData.token,
-        role: invitationData.role,
-        subAgencyId: invitationData.subAgencyId,
-        status: isExpired ? 'expired' : 'pending',
-        createdAt: inv.createdAt.toISOString(),
-        expiresAt: inv.expiresAt.toISOString(),
-      }
-    })
-
-    return NextResponse.json({ data: formattedInvitations })
+    return NextResponse.json({ data: invitations })
   } catch (error: any) {
     if (error.statusCode === 401 || error.statusCode === 403) {
       return NextResponse.json(

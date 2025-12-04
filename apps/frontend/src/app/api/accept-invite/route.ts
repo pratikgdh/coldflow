@@ -43,6 +43,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       email: invitation.email,
       expiresAt: invitation.expiresAt.toISOString(),
+      role: invitation.role,
+      subAgencyId: invitation.subAgencyId,
     })
   } catch (error: any) {
     console.error('Error verifying invitation:', error)

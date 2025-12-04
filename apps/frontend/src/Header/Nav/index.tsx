@@ -1,13 +1,15 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { authClient } from '@/access/authClient'
+import { useMobileMenu } from '@/providers/MobileMenu'
 
 export const HeaderNav: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isMobileMenuOpen, toggleMobileMenu, setMobileMenuOpen } = useMobileMenu()
   const { data: session } = authClient.useSession()
-  const toggleMenu = () => setIsOpen(!isOpen)
-  const closeMenu = () => setIsOpen(false)
+  const isOpen = isMobileMenuOpen
+  const toggleMenu = toggleMobileMenu
+  const closeMenu = () => setMobileMenuOpen(false)
 
   const navLinks = [
     { href: '/docs', label: 'Docs' },

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   getInvitationById,
   deleteInvitation,
-  isAgencyAdmin,
-  isSubAgencyOwner,
 } from '@coldflow/db'
 import { requireAuth } from '@/lib/authorization'
 
@@ -23,14 +21,6 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Invitation not found' },
         { status: 404 }
-      )
-    }
-
-    // Verify the invitation is actually an invite (not another verification type)
-    if (!invitation.identifier.startsWith('invite:')) {
-      return NextResponse.json(
-        { error: 'Invalid invitation' },
-        { status: 400 }
       )
     }
 

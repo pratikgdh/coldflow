@@ -57,24 +57,31 @@ export const account = pgTable(
   (table) => [index("account_userId_idx").on(table.userId)],
 );
 
+// Role enum for user permissions
+export const roleEnum = pgEnum("role", ["admin", "member", "viewer"]);
+
 export const verification = pgTable(
   "verification",
   {
     id: text("id").primaryKey(),
-    identifier: text("identifier").notNull(),
-    value: text("value").notNull(),
+    email: text("email").notNull(),
+    token: text("token").notNull(),
     expiresAt: timestamp("expires_at").notNull(),
+    subAgencyId: text("sub_agency_id"),
+    role: roleEnum("role").notNull().default("member"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
-  },
-  (table) => [index("verification_identifier_idx").on(table.identifier)],
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  }
 );
 
-// Role enum for user permissions
-export const roleEnum = pgEnum("role", ["admin", "member", "viewer"]);
+export type CreateInvitationData = typeof verification.$inferInsert;
+export type Verification = typeof verification.$inferSelect;
 
 // Sub-Agency table
 export const subAgency = pgTable(

@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { agencyUser, user, subAgency } from "../schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, not } from "drizzle-orm";
 
 export interface CreateAgencyUserData {
   id: string;
@@ -26,15 +26,9 @@ export const getAgencyUsersByOwner = async (ownerId: string, subAgencyId?: strin
         name: subAgency.name,
       },
     })
-    .from(agencyUser)
+    .from(agencyUser).where(not(eq(agencyUser.userId, ownerId)))
     .innerJoin(user, eq(agencyUser.userId, user.id))
     .innerJoin(subAgency, eq(agencyUser.subAgencyId, subAgency.id));
-
-  if (subAgencyId) {
-    query = query.where(eq(agencyUser.subAgencyId, subAgencyId)) as any;
-  } else {
-    query = query.where(eq(subAgency.ownerId, ownerId)) as any;
-  }
 
   return query;
 };
