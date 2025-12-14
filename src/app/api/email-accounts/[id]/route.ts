@@ -5,8 +5,8 @@ import {
   deleteEmailAccount,
 } from '@coldflow/db';
 import { sql } from 'drizzle-orm';
-import { db } from '@coldflow/db/client';
-import { emailQueue } from '@coldflow/db/schema';
+import { db } from '@coldflow/db';
+import { emailQueue } from '@coldflow/db';
 
 /**
  * DELETE /api/email-accounts/[id]
